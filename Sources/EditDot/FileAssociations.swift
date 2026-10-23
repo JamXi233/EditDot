@@ -88,7 +88,7 @@ final class FileAssociations {
     }
     func apply(_ extensions: [String], restoring: Bool = false, completion: @escaping (AssociationResult) -> Void) {
         guard !isApplying else { return }
-        guard Bundle(url: applicationURL)?.bundleIdentifier == "com.jamxi.editdot" else {
+        guard Bundle(url: applicationURL)?.bundleIdentifier == "cn.jamsg.editdot" else {
             completion(AssociationResult(failures: Dictionary(uniqueKeysWithValues: Set(extensions).map { ($0, AssociationError.applicationUnavailable as Error) }))); return
         }
         isApplying = true

@@ -8,13 +8,15 @@ final class PreferencesController: NSWindowController, NSTabViewDelegate {
     let tabs = NSTabView()
     let generalButton = NSButton()
     let associationsButton = NSButton()
+    let updatesButton = NSButton()
+    lazy var updateSettings = UpdateSettingsView()
     lazy var associationSettings = AssociationSettingsView()
     init() {
         let panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 680, height: 540), styleMask: [.titled, .closable], backing: .buffered, defer: false)
         panel.isReleasedWhenClosed = false
         super.init(window: panel)
         tabs.tabViewType = .noTabsNoBorder; tabs.delegate = self
-        for button in [generalButton, associationsButton] {
+        for button in [generalButton, associationsButton, updatesButton] {
             button.bezelStyle = .rounded; button.setButtonType(.pushOnPushOff); button.font = .systemFont(ofSize: 12)
             button.target = self; button.action = #selector(selectSection(_:))
             button.imagePosition = .imageLeft
@@ -23,6 +25,7 @@ final class PreferencesController: NSWindowController, NSTabViewDelegate {
         }
         generalButton.image = NSImage(systemSymbolName: "slider.horizontal.3", accessibilityDescription: nil)
         associationsButton.image = NSImage(systemSymbolName: "doc.badge.gearshape", accessibilityDescription: nil)
+        updatesButton.image = NSImage(systemSymbolName: "arrow.down.circle", accessibilityDescription: nil)
         refreshLocalization()
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) is unavailable") }
@@ -59,11 +62,13 @@ final class PreferencesController: NSWindowController, NSTabViewDelegate {
         ])
         let general = NSTabViewItem(identifier: "general"); general.label = tr("preferences.general"); general.view = content
         let associations = NSTabViewItem(identifier: "associations"); associations.label = tr("preferences.file_associations"); associations.view = associationSettings
-        generalButton.title = general.label; associationsButton.title = associations.label
+        let updates = NSTabViewItem(identifier: "updates"); updates.label = tr("updates.section"); updates.view = updateSettings
+        generalButton.title = general.label; associationsButton.title = associations.label; updatesButton.title = updates.label
+        updateSettings.refreshLocalization()
         associationSettings.refreshLocalization()
-        tabs.addTabViewItem(general); tabs.addTabViewItem(associations); tabs.selectTabViewItem(withIdentifier: selected)
+        tabs.addTabViewItem(general); tabs.addTabViewItem(associations); tabs.addTabViewItem(updates); tabs.selectTabViewItem(withIdentifier: selected)
         let host = NSView(); window?.contentView = host
-        let sections = NSStackView(views: [generalButton, associationsButton]); sections.spacing = 6; sections.orientation = .vertical
+        let sections = NSStackView(views: [generalButton, associationsButton, updatesButton]); sections.spacing = 6; sections.orientation = .vertical
         sections.widthAnchor.constraint(equalToConstant: 124).isActive = true
         sections.translatesAutoresizingMaskIntoConstraints = false; host.addSubview(sections)
         let divider = NSBox(); divider.boxType = .separator; divider.translatesAutoresizingMaskIntoConstraints = false; host.addSubview(divider)
@@ -76,10 +81,12 @@ final class PreferencesController: NSWindowController, NSTabViewDelegate {
         ])
         syncValues()
     }
-    @objc func selectSection(_ sender: NSButton) { tabs.selectTabViewItem(withIdentifier: sender === generalButton ? "general" : "associations") }
+    @objc func selectSection(_ sender: NSButton) { tabs.selectTabViewItem(withIdentifier: sender === generalButton ? "general" : sender === associationsButton ? "associations" : "updates") }
     func tabView(_ tabView: NSTabView, didSelect tabViewItem: NSTabViewItem?) {
-        let general = tabViewItem?.identifier as? String == "general"
-        generalButton.state = general ? .on : .off; associationsButton.state = general ? .off : .on
+        let selected = tabViewItem?.identifier as? String
+        generalButton.state = selected == "general" ? .on : .off
+        associationsButton.state = selected == "associations" ? .on : .off
+        updatesButton.state = selected == "updates" ? .on : .off
     }
     private func caption(_ title: String, heading: Bool = false) -> NSTextField {
         let field = label(title, size: heading ? 11 : 12, color: heading ? .secondaryLabelColor : .labelColor)

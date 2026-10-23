@@ -278,7 +278,7 @@ struct EditorSession: Codable {
 
 final class SessionStore {
     let url: URL
-    let queue = DispatchQueue(label: "com.jamxi.editdot.recovery", qos: .utility)
+    let queue = DispatchQueue(label: "cn.jamsg.editdot.recovery", qos: .utility)
     init(directory: URL? = nil) {
         let directory = directory ?? FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("EditDot", isDirectory: true)
         url = directory.appendingPathComponent("session.json")

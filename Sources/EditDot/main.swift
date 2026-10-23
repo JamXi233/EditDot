@@ -8,6 +8,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var launched = false
     func applicationDidFinishLaunching(_ notification: Notification) {
         workspace.start()
+        UpdateController.shared.start()
         launched = true
         NSApp.activate(ignoringOtherApps: true)
         if !pendingFiles.isEmpty { openFiles(pendingFiles); pendingFiles = [] }
@@ -26,12 +27,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         else { openFiles(filenames) }
         sender.reply(toOpenOrPrint: .success)
     }
-    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply { workspace.prepareToQuit() ? .terminateNow : .terminateCancel }
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        guard workspace.prepareToQuit() else { UpdateController.shared.cancelPendingInstall(); return .terminateCancel }
+        guard UpdateController.shared.launchInstallerIfNeeded() else { return .terminateCancel }
+        if UpdateController.shared.waitForPreparationToFinish({ NSApp.reply(toApplicationShouldTerminate: true) }) { return .terminateLater }
+        return .terminateNow
+    }
+    func applicationWillTerminate(_ notification: Notification) { UpdateController.shared.willTerminate() }
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if workspace.windows.isEmpty { workspace.newWindow() }
         else { (workspace.focusedWindow ?? workspace.windows.first)?.window.makeKeyAndOrderFront(nil) }
         return true
     }
+}
+
+if CommandLine.arguments.count == 3, CommandLine.arguments[1] == "--apply-update" {
+    exit(UpdateInstaller.runHelper(manifest: URL(fileURLWithPath: CommandLine.arguments[2])))
 }
 
 let application = NSApplication.shared

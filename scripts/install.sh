@@ -14,7 +14,7 @@ if /usr/bin/pgrep -f '^/Applications/EditDot.app/Contents/MacOS/EditDot($| )' >/
 fi
 /usr/bin/codesign --verify --deep --strict "$SOURCE_APP"
 BUNDLE_ID=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$SOURCE_APP/Contents/Info.plist")
-[ "$BUNDLE_ID" = "com.jamxi.editdot" ] || { printf 'Unexpected app bundle.\n' >&2; exit 1; }
+[ "$BUNDLE_ID" = "cn.jamsg.editdot" ] || { printf 'Unexpected app bundle.\n' >&2; exit 1; }
 INSTALL_STAGE=$(/usr/bin/mktemp -d /Applications/.EditDot-install.XXXXXX)
 INSTALL_DONE=false
 cleanup() {

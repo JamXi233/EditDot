@@ -374,7 +374,7 @@ func label(_ text: String, size: CGFloat = 11, color: NSColor = .secondaryLabelC
 }
 
 final class TabItemView: ChromeView, NSDraggingSource {
-    static let dragType = NSPasteboard.PasteboardType("com.jamxi.editdot.document-tab")
+    static let dragType = NSPasteboard.PasteboardType("cn.jamsg.editdot.document-tab")
     let documentID: UUID
     var onSelect: ((UUID) -> Void)?
     var onClose: ((UUID) -> Void)?

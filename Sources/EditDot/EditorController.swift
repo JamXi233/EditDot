@@ -1012,6 +1012,7 @@ final class EditorController: NSWindowController, NSWindowDelegate, NSTextViewDe
         refreshMainMenu()
         preferences?.refreshLocalization()
         about?.refreshLocalization()
+        UpdateController.shared.refreshLocalization()
         documentInfo?.refreshLocalization()
         quickPicker?.close()
         if browserLoaded { browser.refreshLocalization() }
@@ -1096,6 +1097,7 @@ final class EditorController: NSWindowController, NSWindowDelegate, NSTextViewDe
         func add(_ title: String, _ menu: NSMenu) { let entry = NSMenuItem(title: title, action: nil, keyEquivalent: ""); entry.submenu = menu; main.addItem(entry) }
         let app = NSMenu()
         app.addItem(item(tr("common.about_editdot"), #selector(showAbout)))
+        app.addItem(item(tr("updates.check"), #selector(UpdateController.checkForUpdates(_:)), target: UpdateController.shared))
         app.addItem(.separator())
         app.addItem(item(tr("editor.settings"), #selector(showPreferences), key: ","))
         app.addItem(item(tr("editor.quick_actions"), #selector(showQuickActions), key: "p", modifiers: [.command, .shift]))

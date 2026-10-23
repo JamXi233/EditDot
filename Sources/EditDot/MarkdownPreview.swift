@@ -14,7 +14,7 @@ enum MarkdownRenderError: LocalizedError {
 
 final class MarkdownRenderer {
     static let shared = MarkdownRenderer()
-    let queue = DispatchQueue(label: "com.jamxi.editdot.markdown", qos: .userInitiated)
+    let queue = DispatchQueue(label: "cn.jamsg.editdot.markdown", qos: .userInitiated)
     private let scriptURL: URL?
     private var context: JSContext?
     private var directory: URL?
